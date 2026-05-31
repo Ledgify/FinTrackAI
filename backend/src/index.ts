@@ -1,7 +1,13 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { PrismaClient } from "./generated/prisma/client";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
+
+const adapter = new PrismaLibSql({ url: process.env.DATABASE_URL || "file:./prisma/dev.db" });
+export const prisma = new PrismaClient({ adapter });
 
 const app = express();
 const PORT = process.env.PORT || 8000;
