@@ -7,6 +7,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { swaggerSpec } from "./swagger";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
+import transactionRoutes from "./routes/transactions";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 export const prisma = new PrismaClient({ adapter });
@@ -22,6 +23,7 @@ app.get("/api/docs.json", (_req, res) => res.json(swaggerSpec));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/transactions", transactionRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
