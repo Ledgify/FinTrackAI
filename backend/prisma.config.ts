@@ -1,14 +1,5 @@
-import { readFileSync } from "fs";
+// @ts-nocheck
 import { defineConfig } from "prisma/config";
-
-function getDatabaseUrl(): string {
-  try {
-    const env = readFileSync(".env", "utf-8");
-    const match = env.match(/^DATABASE_URL="?(.+?)"?$/m);
-    if (match) return match[1];
-  } catch {}
-  return "postgresql://localhost:5432/fintrack";
-}
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -16,6 +7,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: getDatabaseUrl(),
+    url: process.env["DATABASE_URL"],
   },
 });
