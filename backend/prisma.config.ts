@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync } from "fs";
 import { defineConfig } from "prisma/config";
 
 function getDatabaseUrl(): string {
