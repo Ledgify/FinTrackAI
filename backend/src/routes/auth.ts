@@ -5,6 +5,37 @@ import { generateToken } from "../middleware/auth";
 
 const router = Router();
 
+/**
+ * @openapi
+ * /api/auth/register:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, username, password]
+ *             properties:
+ *               email:     { type: string, format: email }
+ *               username:  { type: string }
+ *               password:  { type: string, minLength: 6 }
+ *               fullName:  { type: string }
+ *     responses:
+ *       200:
+ *         description: JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 access_token: { type: string }
+ *                 token_type:   { type: string, example: bearer }
+ *       400:
+ *         description: Email already registered
+ */
 router.post("/register", async (req: Request, res: Response) => {
   const { email, username, password, fullName } = req.body;
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -20,6 +51,35 @@ router.post("/register", async (req: Request, res: Response) => {
   res.json({ access_token: token, token_type: "bearer" });
 });
 
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:    { type: string, format: email }
+ *               password: { type: string }
+ *     responses:
+ *       200:
+ *         description: JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 access_token: { type: string }
+ *                 token_type:   { type: string, example: bearer }
+ *       401:
+ *         description: Invalid email or password
+ */
 router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
