@@ -1,9 +1,16 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import { authController } from "../controllers/auth.controller";
 import { validate } from "../middleware/validate.middleware";
 import { registerSchema, loginSchema } from "../schemas/auth.schema";
 
 const router = Router();
+
+const loginLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 5,
+  message: { detail: "Too many attempts. Try again later." },
+});
 
 /**
  * @openapi
@@ -53,6 +60,6 @@ router.post("/register", validate(registerSchema), authController.register);
  *       401:
  *         description: Invalid email or password
  */
-router.post("/login", validate(loginSchema), authController.login);
+router.post("/login", loginLimiter, validate(loginSchema), authController.login);
 
 export default router;
