@@ -1,16 +1,37 @@
-import PDFDocument from 'pdfkit'
+import PDFDocument from "pdfkit";
 
-const pdfkit = require('pdfkit')
-const fs = require("fs")
+interface Transaction {
+  type: string;
+  amount: number;
+  category: string;
+  description: string;
+  date: Date;
+}
 
+export const pdfService = {
+  generateMonthlyReport(transactions: Transaction[], month: number, year: number): PDFKit.PDFDocument {
+    const doc = new PDFDocument({ margin: 50 });
 
-const doc = new PDFDocument();
+    const income = transactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+    const expense = transactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
 
-doc.pipe(fs.createWriteStream('output.pdf'));
+    doc.fontSize(20).text(`Report for ${month}/${year}`, { align: "center" });
+    doc.moveDown();
+    doc.fontSize(14).text(`Income: $${income.toFixed(2)}`);
+    doc.text(`Expense: $${expense.toFixed(2)}`);
+    doc.text(`Balance: $${(income - expense).toFixed(2)}`);
+    doc.moveDown();
 
-doc.font('fonts /PalatinoBold.ttf').fontSize(25).text( ' Текст со встроенным шрифтом!' , 100 , 100 ) ;
+    doc.fontSize(16).text("Transactions", { underline: true });
+    doc.moveDown(0.5);
 
-doc.image('path/to/image.png', {fit: [250, 300], align: 'center', valign: 'center'});
+    for (const tx of transactions) {
+      const sign = tx.type === "income" ? "+" : "-";
+      const date = new Date(tx.date).toLocaleDateString();
+      doc.fontSize(11).text(`${date} | ${tx.category} | ${sign}$${tx.amount.toFixed(2)} ${tx.description ? "- " + tx.description : ""}`);
+    }
 
-doc.addPage().fontSize(25).text( ' Здесь представлена ​​векторная графика...', 100 , 100 ) ;
-  
+    doc.end();
+    return doc;
+  },
+};

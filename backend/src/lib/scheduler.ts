@@ -1,3 +1,9 @@
-import cron from 'node-cron'
+import cron from "node-cron";
 
-// нужно не забыть и прописать импорт в app.ts
+export function startScheduler(): void {
+  cron.schedule("0 20 * * *", () => {
+    console.log("[cron] Reminder: don't forget to log today's expenses");
+  });
+
+  console.log("[cron] Scheduler started");
+}
